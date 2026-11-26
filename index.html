@@ -2,170 +2,116 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>巨魔商店 安装器</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>TrollStore 安装器</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
-    background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 20px;
-    color: #fff;
-  }
-  .card {
-    width: 100%;
-    max-width: 420px;
-    background: rgba(255,255,255,.07);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 24px;
-    padding: 40px 28px 32px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
-  }
-  .icon {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 22px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 44px;
-    box-shadow: 0 10px 30px rgba(102,126,234,.45);
-  }
-  h1 {
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: .5px;
-    margin-bottom: 8px;
-  }
-  .sub {
-    font-size: 14px;
-    color: rgba(255,255,255,.55);
-    margin-bottom: 28px;
-    line-height: 1.6;
-  }
-  .btn {
-    display: block;
-    width: 100%;
-    padding: 17px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
-    font-size: 17px;
-    font-weight: 600;
-    border: none;
-    border-radius: 14px;
-    text-decoration: none;
-    box-shadow: 0 8px 24px rgba(102,126,234,.4);
-    transition: transform .15s, box-shadow .15s;
-    cursor: pointer;
-  }
-  .btn:active {
-    transform: scale(.97);
-    box-shadow: 0 4px 12px rgba(102,126,234,.3);
-  }
-  .btn.secondary {
-    margin-top: 12px;
-    background: rgba(255,255,255,.1);
-    box-shadow: none;
-    border: 1px solid rgba(255,255,255,.15);
-    font-size: 15px;
-    font-weight: 500;
-  }
-  .info {
-    margin-top: 26px;
-    padding-top: 22px;
-    border-top: 1px solid rgba(255,255,255,.1);
-    text-align: left;
-    font-size: 13px;
-    line-height: 1.9;
-    color: rgba(255,255,255,.6);
-  }
-  .info b { color: rgba(255,255,255,.85); font-weight: 600; }
-  .info .row { display: flex; justify-content: space-between; }
-  .warn {
-    margin-top: 18px;
-    padding: 14px 16px;
-    background: rgba(255,180,0,.12);
-    border: 1px solid rgba(255,180,0,.25);
-    border-radius: 12px;
-    font-size: 12.5px;
-    line-height: 1.7;
-    color: rgba(255,210,120,.95);
-    text-align: left;
-  }
-  .ver {
-    margin-top: 20px;
-    font-size: 11px;
-    color: rgba(255,255,255,.3);
-  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+       background:linear-gradient(160deg,#0f0c29,#302b63 50%,#24243e);
+       min-height:100vh;padding:20px;color:#fff}
+  .card{max-width:440px;margin:0 auto;background:rgba(255,255,255,.07);
+        backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+        border:1px solid rgba(255,255,255,.12);border-radius:24px;
+        padding:32px 24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  h1{font-size:22px;text-align:center;margin-bottom:6px}
+  .sub{font-size:13px;color:rgba(255,255,255,.5);text-align:center;margin-bottom:24px}
+  .status{padding:14px 16px;border-radius:12px;font-size:13px;line-height:1.7;margin-bottom:20px}
+  .status.ok{background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.3);color:#7ee787}
+  .status.warn{background:rgba(255,180,0,.15);border:1px solid rgba(255,180,0,.3);color:#ffd479}
+  .status.err{background:rgba(255,69,58,.15);border:1px solid rgba(255,69,58,.3);color:#ff8a80}
+  .btn{display:block;width:100%;padding:17px;
+       background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;
+       font-size:17px;font-weight:600;border:none;border-radius:14px;
+       text-align:center;text-decoration:none;margin-bottom:10px;
+       box-shadow:0 8px 24px rgba(102,126,234,.4);cursor:pointer}
+  .btn:active{transform:scale(.97)}
+  .btn.alt{background:rgba(255,255,255,.1);box-shadow:none;
+           border:1px solid rgba(255,255,255,.18);font-size:14px;font-weight:500}
+  .steps{margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);
+         font-size:13px;line-height:2;color:rgba(255,255,255,.72)}
+  .steps b{color:#fff}
+  .probe{margin-top:18px;font-size:11px;color:rgba(255,255,255,.3);
+         word-break:break-all;line-height:1.9}
+  .fix{margin-top:16px;padding:12px;border-radius:10px;
+       background:rgba(52,199,89,.1);border:1px solid rgba(52,199,89,.25);
+       font-size:12px;color:#7ee787;line-height:1.7}
 </style>
 </head>
 <body>
 <div class="card">
 
-  <div class="icon">🛠</div>
+  <h1>🛠 TrollStore 安装器</h1>
+  <div class="sub">iOS 14.0 – 15.6.1 · 免签名 OTA</div>
 
-  <h1>巨魔商店 安装器</h1>
-  <div class="sub">
-    国内直连下载 · 全机型单包<br>
-    iOS 14.0 – 15.6.1
+  <div id="status" class="status warn">正在检测…</div>
+
+  <div class="fix" id="fixnote" style="display:none">
+    ✅ 已修复「点击没反应」问题<br>
+    原因是 ipa 缺少目录条目，iOS 扫不到 App
   </div>
 
-  <a class="btn" id="installBtn" href="#">
-    点击安装
-  </a>
+  <a class="btn" id="btnManifest">点击安装</a>
+  <a class="btn alt" id="btnIpa">直接下载 IPA（备用）</a>
 
-  <a class="btn secondary" id="directBtn" href="#">
-    直接下载 IPA
-  </a>
-
-  <div class="info">
-    <div class="row"><span>支持设备</span><b>A8 及以上</b></div>
-    <div class="row"><span>A12+ 系统</span><b>iOS 14.0 – 15.6.1</b></div>
-    <div class="row"><span>A12 以下</span><b>iOS 15.0 – 15.5b4</b></div>
-    <div class="row"><span>包大小</span><b>53.6 MB</b></div>
-    <div class="row"><span>版本</span><b>v1.0</b></div>
+  <div class="steps">
+    <b>安装步骤</b><br>
+    1. 必须用 <b>Safari</b> 打开<br>
+    2. 点「点击安装」<br>
+    3. 弹窗点「安装」<br>
+    4. 回桌面等进度条<br>
+    5. 装完找新图标
   </div>
 
-  <div class="warn">
-    ⚠️ 请用 <b>Safari</b> 打开本页面<br>
-    微信 / QQ / Chrome 内置浏览器无法调起安装
-  </div>
-
-  <div class="ver">TrollStore-jumo · 免签名 OTA</div>
+  <div class="probe" id="probe"></div>
 
 </div>
 
 <script>
-(function () {
-  var MANIFEST = 'https://shitou6688.github.io/TrollStore-jumo-dist/manifest.plist';
-  var IPA = 'https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/TrollHelper_iOS15.ipa';
+(function(){
+  var BASE='https://shitou6688.github.io/TrollStore-jumo-dist/';
+  var MANIFEST=BASE+'manifest.plist';
+  var IPA='https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/TrollStore-1.0-fix1.ipa';
 
-  document.getElementById('installBtn').href =
-    'itms-services://?action=download-manifest&url=' + encodeURIComponent(MANIFEST);
-  document.getElementById('directBtn').href = IPA;
+  var ua=navigator.userAgent;
+  var isIOS=/iPhone|iPad|iPod/.test(ua);
+  var isSafari=isIOS&&/Safari/.test(ua)&&
+      !/CriOS|FxiOS|EdgiOS|OPiOS|MicroMessenger|QQ|Weibo|Alipay|DingTalk|UCBrowser|baiduboxapp/i.test(ua);
+  var m=ua.match(/OS (\d+)_(\d+)/);
+  var ver=m?parseFloat(m[1]+'.'+m[2]):0;
 
-  // 非 iOS 设备提示
-  var ua = navigator.userAgent;
-  var isIOS = /iPhone|iPad|iPod/.test(ua);
-  var isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|MicroMessenger|QQ/.test(ua);
+  var st=document.getElementById('status');
+  if(!isIOS){
+    st.className='status err';
+    st.innerHTML='❌ 不是 iOS 设备<br>请用 iPhone 的 Safari 打开';
+  }else if(!isSafari){
+    st.className='status err';
+    st.innerHTML='❌ 当前不是 Safari<br><br>复制下面链接到 Safari 打开：<br>'+
+      '<span style="font-size:11px;color:#fff;word-break:break-all">'+location.href+'</span>';
+  }else if(ver&&ver<14.0){
+    st.className='status warn';
+    st.innerHTML='⚠️ iOS '+ver+' 低于 14.0，不支持';
+  }else if(ver&&ver>15.6){
+    st.className='status warn';
+    st.innerHTML='⚠️ iOS '+ver+' 高于 15.6.1，不支持';
+  }else{
+    st.className='status ok';
+    st.innerHTML='✅ iOS '+(ver||'?')+' Safari，环境正常';
+  }
 
-  if (!isIOS) {
-    document.querySelector('.sub').innerHTML =
-      '当前不是 iOS 设备<br>请用 iPhone 的 Safari 打开';
-  } else if (!isSafari) {
-    var w = document.createElement('div');
-    w.className = 'warn';
-    w.innerHTML = '⚠️ 检测到非 Safari 浏览器<br>请复制链接到 Safari 打开';
-    document.querySelector('.info').before(w);
+  document.getElementById('btnManifest').href=
+    'itms-services://?action=download-manifest&url='+encodeURIComponent(MANIFEST);
+  document.getElementById('btnIpa').href=IPA;
+
+  // 探测
+  var pr=document.getElementById('probe'), L=[];
+  fetch(MANIFEST,{cache:'no-store'}).then(function(r){
+    L.push('manifest HTTP '+r.status);
+    pr.innerHTML=L.join('<br>');
+  }).catch(function(e){ L.push('manifest 失败'); pr.innerHTML=L.join('<br>'); });
+
+  // 如果 URL 带 ?fix=1，显示修复说明
+  if(location.search.indexOf('fix')>=0){
+    document.getElementById('fixnote').style.display='block';
   }
 })();
 </script>

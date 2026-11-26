@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TrollStore 诊断</title>
+<style>
+  body{font-family:-apple-system,"PingFang SC",sans-serif;background:#111;color:#eee;padding:16px;font-size:14px;line-height:1.8}
+  h2{font-size:16px;color:#4fc3f7;margin:20px 0 10px;border-bottom:1px solid #333;padding-bottom:6px}
+  .item{background:#1c1c1e;border-radius:10px;padding:12px;margin-bottom:10px;word-break:break-all;font-size:13px}
+  .ok{color:#7ee787}.fail{color:#ff8a80}.warn{color:#ffd479}
+  a.b{display:block;background:#0a84ff;color:#fff;text-align:center;padding:14px;border-radius:10px;text-decoration:none;margin:8px 0;font-weight:600}
+  pre{background:#000;padding:10px;border-radius:8px;overflow-x:auto;font-size:11px;color:#8f8}
+</style>
+</head>
+<body>
+
+<h1 style="font-size:18px;text-align:center">TrollStore 安装诊断</h1>
+
+<h2>1. 设备信息</h2>
+<div class="item" id="dev">检测中…</div>
+
+<h2>2. 网络可达性</h2>
+<div class="item" id="net">检测中…</div>
+
+<h2>3. 安装（逐个试）</h2>
+<a class="b" id="m1">A. manifest（Pages）</a>
+<a class="b" id="m2">B. manifest（raw.github）</a>
+<a class="b" id="m3">C. manifest（data URI）</a>
+<a class="b" style="background:#ff9f0a" id="m4">D. 直接下载 IPA</a>
+
+<h2>4. 诊断日志</h2>
+<pre id="log">…</pre>
+
+<script>
+var LOG = [];
+function log(s) { LOG.push(s); document.getElementById('log').textContent = LOG.join('\n'); }
+
+var IPA = 'https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/TrollHelper_iOS15.ipa';
+var PLIST_PAGES = 'https://shitou6688.github.io/TrollStore-jumo-dist/manifest.plist';
+var PLIST_RAW = 'https://raw.githubusercontent.com/shitou6688/TrollStore-jumo-dist/main/manifest.plist';
+
+var ua = navigator.userAgent;
+var m = ua.match(/OS (\d+)_(\d+)/);
+var iosVer = m ? m[1] + '.' + m[2] : '?';
+var isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|MicroMessenger|QQ/i.test(ua);
+
+document.getElementById('dev').innerHTML =
+  'iOS: <b>' + iosVer + '</b><br>' +
+  'Safari: ' + (isSafari ? '<span class="ok">是</span>' : '<span class="fail">否（这是问题！）</span>') + '<br>' +
+  'UA: <span style="font-size:11px;color:#888">' + ua + '</span>';
+
+function probe(name, url, cb) {
+  var t0 = Date.now();
+  fetch(url, { cache: 'no-store' })
+    .then(function (r) {
+      var ms = Date.now() - t0;
+      var ct = r.headers.get('content-type') || '(无)';
+      log(name + ' → HTTP ' + r.status + '  ' + ms + 'ms  CT=' + ct);
+      cb(r.status === 200, ms, ct);
+    })
+    .catch(function (e) {
+      log(name + ' → 失败 ' + e.message);
+      cb(false, Date.now() - t0, '');
+    });
+}
+
+var results = {};
+probe('Pages manifest', PLIST_PAGES, function (ok, ms, ct) {
+  results.pages = ok;
+  probe('raw manifest', PLIST_RAW, function (ok2, ms2, ct2) {
+    results.raw = ok2;
+    var html = '';
+    html += 'Pages: ' + (ok ? '<span class="ok">可达 ' + ms + 'ms</span>' : '<span class="fail">不可达</span>') + '<br>';
+    html += 'raw.github: ' + (ok2 ? '<span class="ok">可达 ' + ms2 + 'ms</span>' : '<span class="fail">不可达</span>') + '<br>';
+    if (!ok && !ok2) {
+      html += '<br><span class="warn">两个都不通 → 网络问题，需要换托管</span>';
+    } else {
+      html += '<br><span class="ok">网络正常，问题在 itms-services 或 ipa 本身</span>';
+    }
+    document.getElementById('net').innerHTML = html;
+  });
+});
+
+// 内嵌 manifest（data URI）
+var plist =
+  '<?xml version="1.0" encoding="UTF-8"?>' +
+  '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' +
+  '<plist version="1.0"><dict><key>items</key><array><dict>' +
+  '<key>assets</key><array><dict><key>kind</key><string>software-package</string>' +
+  '<key>url</key><string>' + IPA + '</string></dict></array>' +
+  '<key>metadata</key><dict>' +
+  '<key>bundle-identifier</key><string>com.icraze.gtatracker</string>' +
+  '<key>bundle-version</key><string>16</string>' +
+  '<key>kind</key><string>software</string>' +
+  '<key>title</key><string>TrollStore</string>' +
+  '</dict></dict></array></dict></plist>';
+
+function bind(id, url) {
+  document.getElementById(id).href =
+    'itms-services://?action=download-manifest&url=' + encodeURIComponent(url);
+  document.getElementById(id).addEventListener('click', function () {
+    log('点击 ' + id + ' → 已触发 itms-services');
+  });
+}
+
+bind('m1', PLIST_PAGES);
+bind('m2', PLIST_RAW);
+bind('m3', 'data:application/xml;charset=utf-8,' + encodeURIComponent(plist));
+document.getElementById('m4').href = IPA;
+
+log('页面已加载');
+log('如果点了按钮完全没反应，把上面的诊断信息截图发给开发者');
+</script>
+
+</body>
+</html>
