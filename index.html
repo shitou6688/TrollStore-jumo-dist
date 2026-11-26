@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>巨魔商店 安装器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    color: #fff;
+  }
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,.07);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 24px;
+    padding: 40px 28px 32px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  }
+  .icon {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 22px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    box-shadow: 0 10px 30px rgba(102,126,234,.45);
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin-bottom: 8px;
+  }
+  .sub {
+    font-size: 14px;
+    color: rgba(255,255,255,.55);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 17px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(102,126,234,.4);
+    transition: transform .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  .btn:active {
+    transform: scale(.97);
+    box-shadow: 0 4px 12px rgba(102,126,234,.3);
+  }
+  .btn.secondary {
+    margin-top: 12px;
+    background: rgba(255,255,255,.1);
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,.15);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .info {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,.1);
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.9;
+    color: rgba(255,255,255,.6);
+  }
+  .info b { color: rgba(255,255,255,.85); font-weight: 600; }
+  .info .row { display: flex; justify-content: space-between; }
+  .warn {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: rgba(255,180,0,.12);
+    border: 1px solid rgba(255,180,0,.25);
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: rgba(255,210,120,.95);
+    text-align: left;
+  }
+  .ver {
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,.3);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="icon">🛠</div>
+
+  <h1>巨魔商店 安装器</h1>
+  <div class="sub">
+    国内直连下载 · 全机型单包<br>
+    iOS 14.0 – 15.6.1
+  </div>
+
+  <a class="btn" id="installBtn" href="#">
+    点击安装
+  </a>
+
+  <a class="btn secondary" id="directBtn" href="#">
+    直接下载 IPA
+  </a>
+
+  <div class="info">
+    <div class="row"><span>支持设备</span><b>A8 及以上</b></div>
+    <div class="row"><span>A12+ 系统</span><b>iOS 14.0 – 15.6.1</b></div>
+    <div class="row"><span>A12 以下</span><b>iOS 15.0 – 15.5b4</b></div>
+    <div class="row"><span>包大小</span><b>53.6 MB</b></div>
+    <div class="row"><span>版本</span><b>v1.0</b></div>
+  </div>
+
+  <div class="warn">
+    ⚠️ 请用 <b>Safari</b> 打开本页面<br>
+    微信 / QQ / Chrome 内置浏览器无法调起安装
+  </div>
+
+  <div class="ver">TrollStore-jumo · 免签名 OTA</div>
+
+</div>
+
+<script>
+(function () {
+  var MANIFEST = 'https://raw.githubusercontent.com/shitou6688/TrollStore-jumo-dist/main/manifest.plist';
+  var IPA = 'https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/TrollHelper_iOS15.ipa';
+
+  document.getElementById('installBtn').href =
+    'itms-services://?action=download-manifest&url=' + encodeURIComponent(MANIFEST);
+  document.getElementById('directBtn').href = IPA;
+
+  // 非 iOS 设备提示
+  var ua = navigator.userAgent;
+  var isIOS = /iPhone|iPad|iPod/.test(ua);
+  var isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|MicroMessenger|QQ/.test(ua);
+
+  if (!isIOS) {
+    document.querySelector('.sub').innerHTML =
+      '当前不是 iOS 设备<br>请用 iPhone 的 Safari 打开';
+  } else if (!isSafari) {
+    var w = document.createElement('div');
+    w.className = 'warn';
+    w.innerHTML = '⚠️ 检测到非 Safari 浏览器<br>请复制链接到 Safari 打开';
+    document.querySelector('.info').before(w);
+  }
+})();
+</script>
+</body>
+</html>
