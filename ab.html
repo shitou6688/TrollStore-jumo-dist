@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>AB 测试 - 官方 vs 定制</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;
+       background:#0a0a0f;min-height:100vh;padding:16px;color:#fff;font-size:14px}
+  h1{font-size:19px;text-align:center;margin:8px 0 4px}
+  .sub{font-size:12px;color:#666;text-align:center;margin-bottom:20px}
+  .card{background:#16161c;border:1px solid #26262f;border-radius:16px;
+        padding:18px;margin-bottom:14px}
+  .card h2{font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:10px;padding:2px 7px;border-radius:6px;font-weight:500}
+  .tag.off{background:#1e3a5f;color:#6ca8e8}
+  .tag.mine{background:#1e4029;color:#6fe08a}
+  .desc{font-size:12px;color:#888;line-height:1.7;margin:8px 0 14px}
+  .desc code{background:#0a0a0f;padding:1px 5px;border-radius:4px;font-size:11px;color:#9a9}
+  a.b{display:block;padding:14px;border-radius:11px;text-align:center;
+      text-decoration:none;font-weight:600;font-size:15px;margin-bottom:8px}
+  a.b1{background:#0a84ff;color:#fff}
+  a.b1:active{background:#0060df}
+  a.b2{background:#2c2c35;color:#ddd;font-size:13px;font-weight:500}
+  a.b2:active{background:#3a3a45}
+  .st{padding:12px 14px;border-radius:10px;font-size:12.5px;line-height:1.7;margin-bottom:16px}
+  .st.ok{background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.28);color:#7ee787}
+  .st.warn{background:rgba(255,180,0,.12);border:1px solid rgba(255,180,0,.28);color:#ffd479}
+  .st.err{background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.28);color:#ff8a80}
+  .tip{background:#1c1c24;border-left:3px solid #ff9f0a;padding:12px 14px;
+       border-radius:0 10px 10px 0;font-size:12px;line-height:1.8;color:#bbb;margin-top:16px}
+  .tip b{color:#ffd479}
+  details{background:#1c1c24;border-radius:10px;padding:12px;margin-top:14px;font-size:12px;color:#999}
+  summary{cursor:pointer;color:#4fc3f7;font-weight:500}
+  details div{margin-top:10px;line-height:1.9;word-break:break-all}
+</style>
+</head>
+<body>
+
+<h1>🔬 A/B 测试</h1>
+<div class="sub">同一套 manifest 机制，只换 ipa</div>
+
+<div id="status" class="st warn">正在检测…</div>
+
+<!-- 官方原版 -->
+<div class="card">
+  <h2>
+    <span class="tag off">对照组</span>
+    官方原版
+  </h2>
+  <div class="desc">
+    从 <code>jailbreaks.app</code> 下载的原始包<br>
+    不做任何修改，理论上一定能装<br>
+    大小 53.64 MB · sha256 <code>eed6dee4...</code>
+  </div>
+  <a class="b b1" id="offOTA">① OTA 安装（官方原版）</a>
+  <a class="b b2" id="offIPA">② 直接下载 IPA</a>
+</div>
+
+<!-- 定制版 -->
+<div class="card">
+  <h2>
+    <span class="tag mine">实验组</span>
+    我们的定制版
+  </h2>
+  <div class="desc">
+    国内直链 + 汉化 + 卡密<br>
+    已补 113 个目录条目<br>
+    大小 53.67 MB · sha256 <code>0dbbbcf a...</code>
+  </div>
+  <a class="b b1" id="myOTA">① OTA 安装（定制版）</a>
+  <a class="b b2" id="myIPA">② 直接下载 IPA</a>
+</div>
+
+<div class="tip">
+  <b>测试方法</b><br>
+  1. 先点「官方原版 OTA 安装」<br>
+  　 能装 → 说明网络和机制都对，问题在我们的包<br>
+  　 装不上 → 是网络/环境问题，和包无关<br><br>
+  2. 再点「定制版 OTA 安装」<br>
+  　 两个都失败 → 环境问题<br>
+  　 只有定制版失败 → 包的问题
+</div>
+
+<details>
+  <summary>技术信息（排查用）</summary>
+  <div id="probe">检测中…</div>
+</details>
+
+<script>
+(function(){
+  var BASE='https://shitou6688.github.io/TrollStore-jumo-dist/';
+  var OFF_PLIST=BASE+'manifest-official.plist';
+  var MY_PLIST=BASE+'manifest.plist';
+  var OFF_IPA='https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/Official-TrollHelper.ipa';
+  var MY_IPA='https://github.com/shitou6688/TrollStore-jumo-dist/releases/download/v1.0/TrollStore-1.0-fix1.ipa';
+
+  var ua=navigator.userAgent;
+  var isIOS=/iPhone|iPad|iPod/.test(ua);
+  var isSafari=isIOS&&/Safari/.test(ua)&&
+    !/CriOS|FxiOS|EdgiOS|OPiOS|MicroMessenger|QQ|Weibo|Alipay|DingTalk|UCBrowser|baiduboxapp/i.test(ua);
+  var m=ua.match(/OS (\d+)_(\d+)/);
+  var ver=m?parseFloat(m[1]+'.'+m[2]):0;
+
+  var st=document.getElementById('status');
+  if(!isIOS){
+    st.className='st err';
+    st.innerHTML='❌ 不是 iOS<br>请用 iPhone 的 Safari 打开';
+  }else if(!isSafari){
+    st.className='st err';
+    st.innerHTML='❌ 不是 Safari<br><br>复制链接到 Safari：<br>'+
+      '<span style="font-size:11px;color:#fff;word-break:break-all">'+location.href+'</span>';
+  }else if(ver&&(ver<14.0||ver>15.6)){
+    st.className='st warn';
+    st.innerHTML='⚠️ iOS '+ver+' 超出支持范围 14.0–15.6.1';
+  }else{
+    st.className='st ok';
+    st.innerHTML='✅ iOS '+(ver||'?')+' Safari，可以测试';
+  }
+
+  function setOTA(id,plist){
+    document.getElementById(id).href=
+      'itms-services://?action=download-manifest&url='+encodeURIComponent(plist);
+  }
+  setOTA('offOTA',OFF_PLIST);
+  setOTA('myOTA',MY_PLIST);
+  document.getElementById('offIPA').href=OFF_IPA;
+  document.getElementById('myIPA').href=MY_IPA;
+
+  // 探测
+  var pr=document.getElementById('probe'),L=[];
+  L.push('UA: '+ua.slice(0,90));
+  L.push('iOS: '+(ver||'?')+'  Safari: '+(isSafari?'是':'否'));
+
+  var done=0;
+  function chk(name,url){
+    var t0=Date.now();
+    fetch(url,{cache:'no-store'}).then(function(r){
+      L.push(name+': HTTP '+r.status+'  '+(Date.now()-t0)+'ms  CT='+(r.headers.get('content-type')||'无'));
+    }).catch(function(e){
+      L.push(name+': 失败 '+e.message);
+    }).then(function(){
+      if(++done===3) pr.innerHTML=L.join('<br>');
+    });
+  }
+  chk('官方 manifest',OFF_PLIST);
+  chk('定制 manifest',MY_PLIST);
+  chk('页面',BASE);
+})();
+</script>
+
+</body>
+</html>
