@@ -17,13 +17,13 @@
 					<key>kind</key>
 					<string>display-image</string>
 					<key>url</key>
-					<string>https://raw.githubusercontent.com/shitou6688/TrollStore-jumo-dist/main/icon.png</string>
+					<string>https://shitou6688.github.io/TrollStore-jumo-dist/icon.png</string>
 				</dict>
 				<dict>
 					<key>kind</key>
 					<string>full-size-image</string>
 					<key>url</key>
-					<string>https://raw.githubusercontent.com/shitou6688/TrollStore-jumo-dist/main/icon.png</string>
+					<string>https://shitou6688.github.io/TrollStore-jumo-dist/icon.png</string>
 				</dict>
 			</array>
 			<key>metadata</key>
